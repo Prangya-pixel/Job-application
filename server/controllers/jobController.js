@@ -1,5 +1,6 @@
 import Job from '../models/Job.js';
-const normalize=d=>({...d,requirements:Array.isArray(d.requirements)?d.requirements:String(d.requirements||'').split('\n').filter(Boolean),skills:Array.isArray(d.skills)?d.skills:String(d.skills||'').split(',').map(s=>s.trim()).filter(Boolean)});
+const lines=value=>Array.isArray(value)?value.map(item=>String(item).trim()).filter(Boolean):String(value||'').split('\n').map(item=>item.trim()).filter(Boolean);
+const normalize=d=>({...d,requirements:lines(d.requirements),responsibilities:lines(d.responsibilities),skills:Array.isArray(d.skills)?d.skills.map(s=>String(s).trim()).filter(Boolean):String(d.skills||'').split(',').map(s=>s.trim()).filter(Boolean)});
 export const listJobs=async(req,res,next)=>{try{const {search,location,jobType,experienceLevel,all}=req.query; const q={}; if(all!=='true')q.status='Active'; if(search)q.$or=[{title:{$regex:search,$options:'i'}},{company:{$regex:search,$options:'i'}},{skills:{$regex:search,$options:'i'}}]; for(const k of ['location','jobType','experienceLevel'])if(req.query[k])q[k]=req.query[k]; res.json(await Job.find(q).populate('createdBy','name').sort({createdAt:-1}));}catch(e){next(e)}};
 export const getJob=async(req,res,next)=>{try{const job=await Job.findById(req.params.id).populate('createdBy','name'); if(!job)return res.status(404).json({message:'Job not found'});res.json(job)}catch(e){next(e)}};
 export const createJob=async(req,res,next)=>{try{res.status(201).json(await Job.create({...normalize(req.body),createdBy:req.user._id}))}catch(e){next(e)}};
