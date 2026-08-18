@@ -10,6 +10,11 @@ export function AuthProvider({children}){
 
   useEffect(()=>{
     let active=true;
+    const token = localStorage.getItem('recruitment_token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     auth.profile()
       .then(response=>{if(active)setUser(response.data.user);})
       .catch(()=>{localStorage.removeItem('recruitment_token');if(active)setUser(null);})
