@@ -1,0 +1,1 @@
+import {NavLink} from 'react-router-dom';export default function Sidebar(){return <aside><b>Admin workspace</b><NavLink to="/admin/dashboard">Overview</NavLink><NavLink to="/admin/jobs">Manage jobs</NavLink><NavLink to="/admin/jobs/new">Post a job</NavLink><NavLink to="/admin/applications">Applications</NavLink><NavLink to="/admin/applicants">Applicants</NavLink></aside>}

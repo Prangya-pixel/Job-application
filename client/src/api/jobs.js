@@ -1,0 +1,1 @@
+import api from './client';export const getJobs=p=>api.get('/jobs',{params:p});export const getJob=id=>api.get(`/jobs/${id}`);export const createJob=d=>api.post('/jobs',d);export const updateJob=(id,d)=>api.put(`/jobs/${id}`,d);export const deleteJob=id=>api.delete(`/jobs/${id}`);export const changeJobStatus=(id,status)=>api.patch(`/jobs/${id}/status`,{status});

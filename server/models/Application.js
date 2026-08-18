@@ -1,0 +1,3 @@
+import mongoose from 'mongoose';
+const applicationSchema=new mongoose.Schema({ applicant:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},job:{type:mongoose.Schema.Types.ObjectId,ref:'Job',required:true},fullName:{type:String,required:true},email:{type:String,required:true},phone:{type:String,required:true},education:{type:String,required:true},skills:{type:[String],default:[]},experience:{type:String,required:true},resume:{type:String,required:true},coverLetter:{type:String,default:''},status:{type:String,enum:['Applied','Under Review','Shortlisted','Rejected','Selected'],default:'Applied'} },{timestamps:true});
+applicationSchema.index({applicant:1,job:1},{unique:true}); export default mongoose.model('Application',applicationSchema);

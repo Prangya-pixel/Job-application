@@ -1,0 +1,1 @@
+import {Outlet} from 'react-router-dom';import Navbar from './Navbar';import Sidebar from './Sidebar';export const PublicLayout=()=> <><Navbar/><main><Outlet/></main></>;export const AdminLayout=()=> <><Navbar/><div className="admin-layout"><Sidebar/><main><Outlet/></main></div></>;

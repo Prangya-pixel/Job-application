@@ -1,0 +1,5 @@
+import jwt from 'jsonwebtoken'; import User from '../models/User.js';
+const tokenFor=id=>jwt.sign({id},process.env.JWT_SECRET,{expiresIn:'7d'}); const userData=user=>({id:user._id,name:user.name,email:user.email,phone:user.phone,role:user.role,createdAt:user.createdAt});
+export const register=async(req,res,next)=>{try{const {name,email,password,phone=''}=req.body; if(!name||!email||!password) return res.status(400).json({message:'Name, email, and password are required'}); if(await User.findOne({email})) return res.status(409).json({message:'An account already uses this email'}); const user=await User.create({name,email,password,phone}); res.status(201).json({token:tokenFor(user._id),user:userData(user)});}catch(e){next(e)}};
+export const login=async(req,res,next)=>{try{const {email,password}=req.body; const user=await User.findOne({email}).select('+password'); if(!user||!(await user.matchPassword(password))) return res.status(401).json({message:'Invalid email or password'}); res.json({token:tokenFor(user._id),user:userData(user)});}catch(e){next(e)}};
+export const profile=(req,res)=>res.json({user:userData(req.user)});
