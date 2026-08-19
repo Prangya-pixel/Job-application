@@ -5,9 +5,9 @@ import {createJob,getJob,updateJob} from '../../api/jobs';
 const empty={title:'',company:'',location:'',description:'',requirements:'',responsibilities:'',skills:'',jobType:'Full-Time',experienceLevel:'Entry',salary:'',deadline:'',status:'Active'};
 
 export default function JobForm(){
-  const {id}=useParams(),nav=useNavigate(),[f,setF]=useState(empty),[error,setError]=useState('');
-  useEffect(()=>{if(id)getJob(id).then(r=>{const j=r.data;setF({...j,requirements:j.requirements.join('\n'),responsibilities:(j.responsibilities||[]).join('\n'),skills:j.skills.join(', '),deadline:j.deadline.slice(0,10)})})},[id]);
-  const submit=async e=>{e.preventDefault();try{id?await updateJob(id,f):await createJob(f);nav('/admin/jobs')}catch(e){setError(e.response?.data?.message||'Could not save job')}};
+  const {id}=useParams(),nav=useNavigate(),[f,setF]=useState(empty),[error,setError]=useState(''),[submitting,setSubmitting]=useState(false);
+  useEffect(()=>{if(id)getJob(id).then(r=>{const j=r.data;setF({...empty,...j,requirements:(j.requirements||[]).join('\n'),responsibilities:(j.responsibilities||[]).join('\n'),skills:(j.skills||[]).join(', '),deadline:j.deadline?j.deadline.slice(0,10):''})}).catch(e=>setError(e.response?.data?.message||'Could not load job'))},[id]);
+  const submit=async e=>{e.preventDefault();setError('');setSubmitting(true);try{id?await updateJob(id,f):await createJob(f);nav('/admin/jobs',{replace:true,state:{message:id?'Position updated successfully.':'Position posted successfully.'}})}catch(e){setError(e.response?.data?.message||'Could not save job');setSubmitting(false)}};
   return <section className="auth admin-form"><form className="form-card wide" onSubmit={submit}>
     <p className="eyebrow">Job management</p><h1>{id?'Edit position':'Post a new position'}</h1>{error&&<p className="error">{error}</p>}
     {[['title','Job title'],['company','Company'],['location','Location'],['salary','Salary (optional)'],['deadline','Deadline']].map(([k,l])=><label key={k}>{l}<input required={k!=='salary'} type={k==='deadline'?'date':'text'} value={f[k]} onChange={e=>setF({...f,[k]:e.target.value})}/></label>)}
@@ -17,6 +17,6 @@ export default function JobForm(){
     <label>Responsibilities (one per line)<textarea value={f.responsibilities} onChange={e=>setF({...f,responsibilities:e.target.value})}/></label>
     <label>Requirements (one per line)<textarea required value={f.requirements} onChange={e=>setF({...f,requirements:e.target.value})}/></label>
     <label>Skills (comma separated)<input value={f.skills} onChange={e=>setF({...f,skills:e.target.value})}/></label>
-    <button className="button">Save position</button>
+    <button className="button" disabled={submitting}>{submitting?'Saving...':'Save position'}</button>
   </form></section>;
 }
